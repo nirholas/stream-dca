@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StreamDCA: A standing order that buys more when the price falls, settled inside other people's swaps</title>
+<meta name="description" content="A standing order that buys more when the price falls, settled inside other people's swaps.">
+<link rel="canonical" href="https://stream-dca.pages.dev/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#07080b">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="StreamDCA">
+<meta property="og:title" content="StreamDCA">
+<meta property="og:description" content="A standing order that buys more when the price falls, settled inside other people's swaps.">
+<meta property="og:url" content="https://stream-dca.pages.dev/">
+<meta property="og:image" content="https://stream-dca.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="StreamDCA">
+<meta name="twitter:description" content="A standing order that buys more when the price falls, settled inside other people's swaps.">
+<meta name="twitter:image" content="https://stream-dca.pages.dev/og.png">
+
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="alternate" type="text/plain" title="For language models" href="/llms.txt">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"StreamDCA","description":"A standing order that buys more when the price falls, settled inside other people's swaps.","url":"https://stream-dca.pages.dev","codeRepository":"https://github.com/nirholas/stream-dca","programmingLanguage":"Solidity","runtimePlatform":"Ethereum Virtual Machine","license":"https://www.apache.org/licenses/LICENSE-2.0","keywords":"order-types, dca, value-averaging, keeper-free, no-admin","isPartOf":{"@type":"WebSite","name":"HookForge","url":"https://hookforge.pages.dev"}}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <div class="shell masthead__inner">
+    <a class="brand" href="/">StreamDCA</a>
+    <nav aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#using">Using it</a>
+      <a href="#deploy">Deploy</a>
+      <a href="https://github.com/nirholas/stream-dca" rel="noopener">GitHub</a>
+      <a href="https://hookforge.pages.dev" rel="noopener">Catalogue</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="stage">
+    <div class="scene">
+      <canvas data-permissions="{&quot;afterRemoveLiquidityReturnsDelta&quot;:false,&quot;afterAddLiquidityReturnsDelta&quot;:false,&quot;afterSwapReturnsDelta&quot;:false,&quot;beforeSwapReturnsDelta&quot;:false,&quot;afterDonate&quot;:false,&quot;beforeDonate&quot;:false,&quot;afterSwap&quot;:false,&quot;beforeSwap&quot;:true,&quot;afterRemoveLiquidity&quot;:false,&quot;beforeRemoveLiquidity&quot;:false,&quot;afterAddLiquidity&quot;:false,&quot;beforeAddLiquidity&quot;:false,&quot;afterInitialize&quot;:false,&quot;beforeInitialize&quot;:false}" aria-hidden="true"></canvas>
+      <p class="scene__fallback">StreamDCA implements 1 of the fourteen Uniswap v4 callbacks: beforeSwap.</p>
+    </div>
+    <p class="scene__hint">drag to orbit</p>
+
+  <section class="shell hero">
+    <p class="eyebrow">Uniswap v4 hook &middot; Order types</p>
+    <h1>StreamDCA</h1>
+    <p class="lede">A standing order that buys more when the price falls, settled inside other people's swaps.</p>
+    <div class="cta-row">
+      <a class="btn btn--primary" href="https://github.com/nirholas/stream-dca" rel="noopener">Source on GitHub</a>
+      <a class="btn" href="#using">Use it in a pool</a>
+      <a class="btn" href="/hook.json">Manifest JSON</a>
+    </div>
+
+    <dl class="stats">
+      <div class="stat"><dt>Family</dt><dd>Order types</dd></div>
+      <div class="stat"><dt>Callbacks</dt><dd>1 of 14</dd></div>
+      <div class="stat"><dt>Fee</dt><dd>static</dd></div>
+      <div class="stat"><dt>Admin keys</dt><dd>none</dd></div>
+      <div class="stat"><dt>Licence</dt><dd>Apache-2.0</dd></div>
+    </dl>
+  </section>
+  </div>
+
+  <section class="shell">
+    <h2 id="how">How it works</h2>
+      <p>Every on-chain recurring buy built so far spends a fixed amount per period. That is dollar-cost averaging, and it is popular because it is easy to explain rather than because it is good: it spends the same money whether the asset just halved or just doubled, which is to say it treats the two identically and buys the most units in exactly the periods that matter least. The strategy that fixes this is older than crypto.</p>
+      <p>Value averaging, described by Michael Edleson in 1988, commits to growing the *position* by a fixed amount each period rather than spending a fixed amount. If the price fell, the position is behind its target and the period buys more; if it rose, the position is ahead and the period buys less or nothing. It beats dollar-cost averaging on essentially every historical series, and it has not been built on-chain because it needs a price at every period and a recomputation per participant, which is exactly the shape of thing a keeper bot is bad at and a hook is good at.</p>
+      <p>A stream here names a budget, a period, and how much value the position should gain each period. Nothing runs on a schedule: due streams are settled inside the next swap anybody makes on the pool, in one batched trade per direction, priced by the pool itself. That batching is what makes it affordable, and it is also what makes it fair, since every stream due in the same block gets the same price rather than a queue position.</p>
+      <p>The reference price is the pool's own. That is deliberate and it is the sharp edge: a manipulated pool price makes a stream buy the wrong amount, so this belongs on pools deep enough that moving them costs more than the streams behind them are worth.</p>
+
+    <div class="callout callout--prior"><h3>Prior art</h3><p>TWAMM, both the original paper and the v4 hooks implementing it, splits a large order over time at a constant rate. Mean Finance and the DCA protocols run keeper bots on fixed-size periodic buys. Sablier and Superfluid stream tokens without trading them.</p>
+      <p>Value averaging itself is a 1988 equity strategy with no on-chain implementation. Making the per-period amount a function of how far the position is from its target value, priced by the pool and settled in batches inside unrelated swaps, is the contribution here.</p></div>
+    <div class="callout callout--warn"><h3>Where it does not help</h3><p>The pool's own price is the reference, so a pool shallow enough to move cheaply is a pool where streams can be made to buy at the wrong size; this belongs on deep pools. Streams settle when somebody swaps, so a pool with no flow leaves them late until anybody calls `poke`, and a late period is executed at the price it is finally seen at rather than the price it was due at. Work per swap is capped, so a pool with more due streams than the cap catches up over several swaps rather than all at once.</p>
+      <p>A stream can also finish under budget, since a position that keeps running ahead of target never spends the rest.</p></div>
+
+    <h2 id="using">Using it</h2>
+    <p>
+      Uniswap v4 removed <code>hookData</code> from <code>initialize</code>, so per-pool parameters arrive out of band.
+      Fix them for a pool key whose pool does not exist yet, then initialize. Nobody can change them afterwards,
+      including you.
+    </p>
+    <pre><code>poolManager.initialize(key, startingSqrtPriceX96);</code></pre>
+    
+
+    <h3>Parameters</h3>
+    <p>This hook takes no per-pool configuration.</p>
+
+    <h3>From TypeScript</h3>
+    <pre><code>npm i @hookforge/sdk
+
+import {getHook, hookAddress, poolKeyFor} from "@hookforge/sdk";
+
+const hook = getHook("stream-dca");
+const key  = poolKeyFor({
+  hook: hookAddress("stream-dca", 8453),   // Base
+  currencyA: USDC, currencyB: WETH,
+  tickSpacing: 60,
+});</code></pre>
+
+    <h2>What it reverts with</h2>
+    <table>
+        <thead><tr><th>Error</th><th>Meaning</th></tr></thead>
+        <tbody><tr><td><code>CallbackNotPoolManager()</code></td><td>Only the <code>PoolManager</code> may drive the unlock callback.</td></tr>
+          <tr><td><code>InvalidStream()</code></td><td>A stream with no budget, no periods, or a zero-length period is not a stream.</td></tr>
+          <tr><td><code>NoSuchStream()</code></td><td>There is no stream at that index on this pool.</td></tr>
+          <tr><td><code>NotYourStream()</code></td><td>Only the account that opened a stream may change or close it.</td></tr>
+          <tr><td><code>NothingToWithdraw()</code></td><td>The stream has nothing left to withdraw.</td></tr>
+          <tr><td><code>SafeCastOverflowedIntToUint(int256)</code></td><td>An int value doesn't fit in a uint of <code>bits</code> size.</td></tr>
+          <tr><td><code>SafeCastOverflowedUintDowncast(uint8,uint256)</code></td><td>Value doesn't fit in a uint of <code>bits</code> size.</td></tr>
+          <tr><td><code>SafeCastOverflowedUintToInt(uint256)</code></td><td>A uint value doesn't fit in an int of <code>bits</code> size.</td></tr>
+          <tr><td><code>SafeERC20FailedOperation(address)</code></td><td>An operation with an ERC-20 token failed.</td></tr></tbody>
+      </table>
+
+    <h2>The callbacks it claims</h2>
+    <p>
+      Uniswap v4 reads a hook's permissions from the low fourteen bits of its own address, which is why deploying one
+      means mining a CREATE2 salt. This hook claims 1, so every deployment of it has an address ending
+      in <code>0x80</code>.
+    </p>
+    <ul class="flags"><li class="flag">beforeInitialize</li><li class="flag">afterInitialize</li><li class="flag">beforeAddLiquidity</li><li class="flag">afterAddLiquidity</li><li class="flag">beforeRemoveLiquidity</li><li class="flag">afterRemoveLiquidity</li><li class="flag flag--on">beforeSwap</li><li class="flag">afterSwap</li><li class="flag">beforeDonate</li><li class="flag">afterDonate</li><li class="flag">beforeSwapReturnsDelta</li><li class="flag">afterSwapReturnsDelta</li><li class="flag">afterAddLiquidityReturnsDelta</li><li class="flag">afterRemoveLiquidityReturnsDelta</li></ul>
+
+    <h2>It says what it is, on-chain</h2>
+    <p>
+      Nothing about a hook's address tells an indexer, a wallet, a router or an agent what the pool does, which is why
+      hook discovery today is a curated list. This hook answers for itself, in one <code>eth_call</code>, with no
+      registry in the loop.
+    </p>
+    <pre><code>cast call $HOOK "hookName()(string)"    # StreamDCA
+cast call $HOOK "specURI()(string)"     # https://stream-dca.pages.dev/hook.json
+cast call $HOOK "hookTags()(string[])"  # order-types, dca, value-averaging, keeper-free, no-admin</code></pre>
+
+    <h2 id="deploy">Build, test and deploy</h2>
+    <pre><code>git clone --recurse-submodules https://github.com/nirholas/stream-dca
+cd stream-dca
+forge build &amp;&amp; forge test
+
+# Dry run: mines the salt, prints the address, sends nothing.
+forge script script/Deploy.s.sol --rpc-url $RPC_URL
+
+# For real.
+forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify</code></pre>
+
+    <div class="callout callout--warn">
+      <h3>Status</h3>
+      <p>
+        <strong>Unaudited.</strong> Built to an audited shape, on OpenZeppelin's audited hook bases, and tested against
+        a real <code>PoolManager</code>. No third party has reviewed it. Read "where it does not help" above before
+        putting money behind it. Not affiliated with Uniswap Labs.
+      </p>
+    </div>
+  </section>
+
+  <section class="shell">
+    <h2 id="try">Try it</h2>
+    <p>
+      This is the hook running, not a picture of it. Connect a wallet on a chain it is deployed to, or bring the whole
+      stack up locally in one command and use it with no funds and no wallet risk at all.
+    </p>
+    <div class="demo" data-demo="stream-dca">
+      <div class="panel panel--empty">
+        <p>Loading the demo… if this does not change, JavaScript is blocked and the demo cannot run.</p>
+      </div>
+    </div>
+    <details class="raw">
+      <summary>Run the whole thing locally</summary>
+      <pre><code>git clone --recurse-submodules https://github.com/nirholas/stream-dca
+cd stream-dca
+
+anvil &amp;
+forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast \
+  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+node web/build.mjs &amp;&amp; npx serve web/dist</code></pre>
+      <p class="muted">
+        The deploy script writes <code>web/local.json</code> itself and the build merges it, so the page points at the
+        chain you just created without you editing anything. Point a wallet at
+        <code>http://127.0.0.1:8545</code> and every button on this page works.
+      </p>
+      <p class="muted">
+        Anvil's first account is pre-funded and its key is public by design. Never use it anywhere real.
+      </p>
+    </details>
+  </section>
+  <script type="application/json" id="deployments">{"chains":{},"errors":[{"type":"error","name":"CallbackNotPoolManager","inputs":[]},{"type":"error","name":"HookNotImplemented","inputs":[]},{"type":"error","name":"InvalidPool","inputs":[]},{"type":"error","name":"InvalidStream","inputs":[]},{"type":"error","name":"NoSuchStream","inputs":[]},{"type":"error","name":"NotPoolManager","inputs":[]},{"type":"error","name":"NotYourStream","inputs":[]},{"type":"error","name":"NothingToWithdraw","inputs":[]},{"type":"error","name":"SafeCastOverflowedIntToUint","inputs":[{"name":"value","type":"int256","internalType":"int256"}]},{"type":"error","name":"SafeCastOverflowedUintDowncast","inputs":[{"name":"bits","type":"uint8","internalType":"uint8"},{"name":"value","type":"uint256","internalType":"uint256"}]},{"type":"error","name":"SafeCastOverflowedUintToInt","inputs":[{"name":"value","type":"uint256","internalType":"uint256"}]},{"type":"error","name":"SafeERC20FailedOperation","inputs":[{"name":"token","type":"address","internalType":"address"}]}],"demo":{"panel":"stream","title":"A standing order that buys more when the price falls","lede":"Dollar-cost averaging spends the same money whether the asset halved or doubled. This commits to growing the position by a fixed amount each period instead, so a cheaper price means a larger buy and a dearer one means a smaller buy or none. Open a stream, move the pool, and watch the next buy resize itself.","defaultBudget":"10","defaultPerPeriod":"1","defaultPeriodMinutes":"1","defaultPeriods":"10","zeroForOneLabel":"Spend currency0, buy currency1","oneForZeroLabel":"Spend currency1, buy currency0","localDeploy":{"flags":"Hooks.BEFORE_SWAP_FLAG","dynamicFee":false}}}</script>
+  <script type="module" src="/assets/demo.js"></script>
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <p>
+      <a href="https://github.com/nirholas/stream-dca" rel="noopener">Source</a> &middot;
+      <a href="/hook.json">Manifest</a> &middot;
+      <a href="/llms.txt">llms.txt</a> &middot;
+      <a href="https://hookforge.pages.dev" rel="noopener">The rest of the catalogue</a>
+    </p>
+    <p>Apache-2.0 licensed. Not affiliated with Uniswap Labs.</p>
+  </div>
+</footer>
+<script type="module" src="/assets/scene.js"></script>
+</body>
+</html>

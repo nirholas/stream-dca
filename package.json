@@ -1,0 +1,30 @@
+{
+  "name": "stream-dca",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A standing order that buys more when the price falls, settled inside other people's swaps.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nirholas/stream-dca.git"
+  },
+  "homepage": "https://stream-dca.pages.dev",
+  "keywords": [
+    "uniswap",
+    "uniswap-v4",
+    "uniswap-hooks",
+    "defi",
+    "amm",
+    "solidity",
+    "order-types",
+    "dca",
+    "value-averaging",
+    "keeper-free",
+    "no-admin"
+  ],
+  "scripts": {
+    "build": "node web/build.mjs",
+    "contracts:build": "forge build",
+    "contracts:test": "forge test"
+  }
+}
