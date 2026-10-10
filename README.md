@@ -1,5 +1,10 @@
 # StreamDCA
 
+<!-- three.ws:badges -->
+[![GitHub stars](https://img.shields.io/github/stars/nirholas/stream-dca?style=flat&logo=github)](https://github.com/nirholas/stream-dca/stargazers) [![License](https://img.shields.io/github/license/nirholas/stream-dca?style=flat)](https://github.com/nirholas/stream-dca/blob/HEAD/LICENSE) [![Last commit](https://img.shields.io/github/last-commit/nirholas/stream-dca?style=flat)](https://github.com/nirholas/stream-dca/commits) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat)](https://github.com/nirholas/stream-dca/pulls) [![AI agent friendly](https://img.shields.io/badge/AI%20agents-AGENTS.md%20%2B%20llms.txt-6d5dfc?style=flat)](https://github.com/nirholas/stream-dca/blob/HEAD/AGENTS.md)
+<!-- /three.ws:badges -->
+
+
 **A standing order that buys more when the price falls, settled inside other people's swaps.**
 
 A production Uniswap v4 hook. It holds no funds and takes no fee for itself. No owner, no pause switch, no upgrade path.
@@ -109,3 +114,26 @@ Not affiliated with Uniswap Labs.
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=nirholas/stream-dca&type=Date)](https://www.star-history.com/#nirholas/stream-dca&Date)
+
+<!-- three.ws:growth -->
+## Support the project
+
+If stream-dca saves you time, **[star it on GitHub](https://github.com/nirholas/stream-dca)**. Stars are how other developers and AI agents find the repositories worth trusting, and they cost you one click.
+
+Know someone who would use it? [Post on X](https://twitter.com/intent/tweet?text=stream-dca%3A%20A%20standing%20order%20that%20buys%20more%20when%20the%20price%20falls%2C%20settled%20inside%20other%20people's%20swaps&url=https%3A%2F%2Fgithub.com%2Fnirholas%2Fstream-dca) · [Share on Bluesky](https://bsky.app/intent/compose?text=stream-dca%3A%20A%20standing%20order%20that%20buys%20more%20when%20the%20price%20falls%2C%20settled%20inside%20other%20people's%20swaps%20https%3A%2F%2Fgithub.com%2Fnirholas%2Fstream-dca) · [Share on LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fgithub.com%2Fnirholas%2Fstream-dca) · [Submit to Hacker News](https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fgithub.com%2Fnirholas%2Fstream-dca&t=stream-dca%3A%20A%20standing%20order%20that%20buys%20more%20when%20the%20price%20falls%2C%20settled%20inside%20other%20people's%20swaps) · [Share on Reddit](https://www.reddit.com/submit?url=https%3A%2F%2Fgithub.com%2Fnirholas%2Fstream-dca&title=stream-dca%3A%20A%20standing%20order%20that%20buys%20more%20when%20the%20price%20falls%2C%20settled%20inside%20other%20people's%20swaps)
+
+## Built for AI agents too
+
+Coding agents and LLM tooling can read this repo directly: [AGENTS.md](./AGENTS.md), [llms.txt](./llms.txt), [llms-full.txt](./llms-full.txt). Point an agent at `https://github.com/nirholas/stream-dca` and it has the context it needs.
+
+## More from the same author
+
+- [All repositories by nirholas](https://github.com/nirholas/nirholas#readme): the full catalog, grouped by topic
+- [three.ws](https://three.ws): the platform for 3D AI agents with Solana wallets, a skill marketplace and x402 payments
+- Questions or ideas: [open an issue](https://github.com/nirholas/stream-dca/issues) or [start a discussion](https://github.com/nirholas/stream-dca/discussions)
+
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=nirholas/stream-dca)](https://github.com/nirholas/stream-dca/graphs/contributors)
+
+<!-- /three.ws:growth -->
